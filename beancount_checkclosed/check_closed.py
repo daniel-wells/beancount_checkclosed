@@ -39,8 +39,12 @@ def check_closed(entries, options_map):
     units_map = collections.defaultdict(set)
     for entry in entries:
         if isinstance(entry, data.Open):
-            for currency in entry.currencies:
-                units_map[entry.account].add(currency)
+            if entry.currencies is not None:
+                for currency in entry.currencies:
+                    units_map[entry.account].add(currency)
+        if isinstance(entry, data.Transaction):
+            for posting in entry.postings:
+                units_map[posting.account].add(posting.units.currency)
         if isinstance(entry, data.Close):
             if account_types.is_balance_sheet_account(entry.account, account_types.DEFAULT_ACCOUNT_TYPES):
                 date = entry.date + datetime.timedelta(days=1)
